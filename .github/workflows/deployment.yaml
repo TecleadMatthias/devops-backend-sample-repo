@@ -46,11 +46,17 @@ jobs:
         run: |
           git push origin main
 
+      - name: Trigger build_image workflow
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT }}
+          repository: ${{ github.repository }}
+          event-type: build_image
+
       - name: Deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          # echo "$SSH_PRIVATE_KEY" > private_key.pem
-          # chmod 600 private_key.pem
-          # scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r nestjs-sample-app/dist/* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/matze/backend
-          ${{ github.event.client_payload.build_image }}
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r nestjs-sample-app/dist/* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/matze/backend
