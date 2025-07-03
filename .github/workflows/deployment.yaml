@@ -29,9 +29,9 @@ jobs:
 
     - name: Install and build 
       run: |
-        npm ci 
+        cd nestjs-sample-app
+        npm ci
         npm run build 
-
 
     - name: Deploy
       env:
@@ -39,4 +39,4 @@ jobs:
       run: |
         echo "$SSH_PRIVATE_KEY" > private_key.pem
         chmod 600 private_key.pem
-        scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r dist/* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/matze/backend
+        scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r nestjs-sample-app/dist/* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/matze/backend
