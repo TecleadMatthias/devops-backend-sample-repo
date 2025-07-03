@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2](https://github.com/TecleadMatthias/devops-backend-sample-repo/compare/0.1.1...0.1.2) (2025-07-03)
+
+### Bug Fixes
+
+* fix pipeline syntax error ([421f19e](https://github.com/TecleadMatthias/devops-backend-sample-repo/commit/421f19ef587d2106b580f70e136c6e4e5d399a77))
+
 ## [0.1.1](https://github.com/TecleadMatthias/devops-backend-sample-repo/compare/0.1.0...0.1.1) (2025-07-03)
 
 ## 0.1.0 (2025-07-03)
