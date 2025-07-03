@@ -1,0 +1,42 @@
+name: Deploy repos with SCP 
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy: 
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+      with:
+        # Fetches all history for all branches and tags
+        fetch-depth: 0
+        # This is needed to push changes back to the repo
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '23'
+
+    - name: Install and build 
+      run: |
+        npm ci 
+        npm run build 
+
+
+    - name: Deploy
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r dist/* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/matze/backend

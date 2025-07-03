@@ -1,0 +1,6 @@
+/nestjs-sample-app/node_modules
+/nestjs-sample-app/dist
+
+*.log
+*.md
+.git
