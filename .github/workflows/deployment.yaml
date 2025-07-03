@@ -1,4 +1,4 @@
-name: Deploy repos with SCP 
+name: Deploy repos with SCP
 
 on:
   pull_request:
@@ -9,34 +9,46 @@ on:
       - main
 
 jobs:
-  deploy: 
+  deploy:
     runs-on: ubuntu-latest
+    # Grant write permissions to the GITHUB_TOKEN
+    permissions:
+      contents: write
 
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          # Fetches all history for all branches and tags
+          fetch-depth: 0
+          # This is needed to push changes back to the repo
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Checkout Repo
-      uses: actions/checkout@v4
-      with:
-        # Fetches all history for all branches and tags
-        fetch-depth: 0
-        # This is needed to push changes back to the repo
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "23"
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '23'
+      - name: Install and build
+        run: |
+          cd nestjs-sample-app
+          npm ci
+          npm run build
 
-    - name: Install and build 
-      run: |
-        cd nestjs-sample-app
-        npm ci
-        npm run build 
+      - name: Changelog and versioning
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          npm run release-it
 
-    - name: Deploy
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-      run: |
-        echo "$SSH_PRIVATE_KEY" > private_key.pem
-        chmod 600 private_key.pem
-        scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r nestjs-sample-app/dist/* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/matze/backend
+      - name: Push changes
+        run: |
+          git push origin main
+
+      - name: Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i private_key.pem -r nestjs-sample-app/dist/* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/matze/backend

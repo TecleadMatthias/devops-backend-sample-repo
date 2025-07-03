@@ -1,0 +1,15 @@
+{
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "conventionalcommits",
+      "infile": "CHANGELOG.md"
+    }
+  },
+  "gitlab": {
+    "release": false
+  },
+  "git": {
+    "requireBranch": "main",
+    "commitMessage": "chore: release v${version}"
+  }
+}
