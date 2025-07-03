@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.1.1](https://github.com/TecleadMatthias/devops-backend-sample-repo/compare/0.1.0...0.1.1) (2025-07-03)
+
 ## 0.1.0 (2025-07-03)
 
 ### Features
