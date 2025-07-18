@@ -1,0 +1,62 @@
+services: 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    hostname: mongodb
+    volumes: 
+      - ./mongodb/initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - mongodb-data:/data/db/
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports: 
+      - "27017:27017"
+    networks: 
+      - devops_network
+
+  mongo-express: 
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    environment: 
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_SERVER: 'mongodb'
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    ports:
+      - 8081:8081
+    networks:
+      - devops_network
+    depends_on: 
+      - mongodb
+
+  nest-app: 
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    container_name: nest-app
+    environment: 
+      DATABASE_URI: mongodb://mongodb:27017
+      DATABASE_NAME: books
+      DATABASE_USER: admin
+      DATABASE_PASS: admin
+    ports:
+      - 3000:3000
+    networks:
+      - devops_network
+    depends_on: 
+      - mongodb
+
+
+volumes: 
+  mongodb-data:
+    driver: local
+    name: mongo-data
+
+networks: 
+  devops_network: 
+    driver: bridge
+    name: tlv-devops-network
